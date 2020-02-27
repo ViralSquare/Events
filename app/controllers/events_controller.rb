@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
-  before_action :set_event, only: %i[show edit update destroy]
+  before_action :set_event, only: %i[show edit update destroy invitation send_invitations]
 
   # GET /events
   # GET /events.json
@@ -55,6 +55,24 @@ class EventsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to events_url, notice: 'Event was successfully destroyed.' }
       format.json { head :no_content }
+    end
+  end
+
+  def invitation
+    respond_to do |format|
+      format.html {}
+      format.js {}
+    end
+  end
+
+  def send_invitations
+    InvitationService.new(params[:emails].split(','), @event).send_invites
+    respond_to do |format|
+      format.html {
+        flash[:success] = "Email Has been processed"
+        redirect_back(fallback_location: events_url(@event))
+      }
+      format.js {}
     end
   end
 
